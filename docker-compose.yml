@@ -1,0 +1,42 @@
+services:
+  migration:
+    container_name: migration
+    build:
+      context: .
+      dockerfile: Migrate.Dockerfile
+    environment:
+      APP_ENV: prod
+      TZ: "Asia/Taipei"
+    volumes:
+      - ./logs:/app/logs
+      - ./config:/config
+    secrets:
+      - migration_password
+    entrypoint: /tmp/bin/migrate
+
+  downloader:
+    container_name: downloader
+    build:
+      context: .
+      dockerfile: Downloader.Dockerfile
+    environment:
+      APP_ENV: prod
+      TZ: "Asia/Taipei"
+    volumes:
+      - ./logs:/app/logs
+      - ./config:/config
+      - ./data-sources:/data-sources
+    secrets:
+      - downloader_password
+    entrypoint: /tmp/bin/gpx-downloader
+    depends_on:
+      migration:
+        condition: service_completed_successfully
+
+
+
+secrets:
+  downloader_password:
+    file: ./secrets/downloader_password
+  migration_password:
+    file: ./secrets/migration_password
