@@ -1,0 +1,16 @@
+Database:
+  Enabled: true
+  Host: "192.168.30.254"
+  Port: "5432"
+  DBName: gpx_data
+  Username: downloader
+  PasswordPath: /run/secrets/downloader_password
+
+
+Logging:
+  LogPath: ./logs/downloader/downloader.log
+  LogLevel: INFO
+  CompressLogs: true
+  MaxSize: 50
+  MaxAge: 30
+  MaxBackups: 10
