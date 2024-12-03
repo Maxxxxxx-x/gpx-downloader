@@ -109,9 +109,15 @@ func main() {
 		recordsToDownload = append(recordsToDownload, csvFile.Data...)
         log.Info().Msgf("File: %s | Records: %d", csvFile.FileName, len(csvFile.Data))
 	}
-    log.Info().Msgf("Total records records expected: %d | Total files expected: %d", len(recordsToDownload), len(recordsToDownload) + len(csvFiles))
+    log.Info().Msgf(
+        "Total records records: %d | Total files: %d | GPX Files: %d | CSV Files: %d",
+        len(recordsToDownload),
+        len(recordsToDownload) + len(csvFiles),
+        len(recordsToDownload),
+        len(csvFiles),
+    )
 
-	if len(recordsToDownload) < 1 {
+    if len(recordsToDownload) < 1 {
 		log.Fatal().Msg("FAILED TO GET RECORDS TO DOWNLOAD. EXITIING")
 		return
 	}
