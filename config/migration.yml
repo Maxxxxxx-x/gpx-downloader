@@ -1,0 +1,15 @@
+Database:
+  Enabled: true
+  Host: "192.168.30.254"
+  Port: "5432"
+  DBName: gpx_data
+  Username: migration
+  PasswordPath: /run/secrets/migration_password
+
+Logging:
+  LogPath: ./logs/migration/migration.log
+  LogLevel: INFO
+  CompressLogs: true
+  MaxSize: 50
+  MaxAge: 30
+  MaxBackups: 10
