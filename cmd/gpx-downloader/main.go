@@ -11,7 +11,7 @@ import (
 	"github.com/Maxxxxxx-x/gpx-downloader/internal/db"
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	// "github.com/Maxxxxxx-x/gpx-downloader/internal/downloader"
+	"github.com/Maxxxxxx-x/gpx-downloader/internal/downloader"
 	"github.com/Maxxxxxx-x/gpx-downloader/internal/logger"
 	"github.com/Maxxxxxx-x/gpx-downloader/internal/models"
 	"github.com/Maxxxxxx-x/gpx-downloader/internal/parser"
@@ -19,6 +19,7 @@ import (
 
 const (
 	OUTPUT_PATH = "data-sources/gpx/"
+    DOWNLOAD_FILES = false
 )
 
 func ensureDownloadPath() (string, error) {
@@ -115,7 +116,9 @@ func main() {
 		return
 	}
 
-	// downloader.StartDownload(recordsToDownload, installPath, log)
+    if DOWNLOAD_FILES {
+	    downloader.StartDownload(recordsToDownload, installPath, log)
+    }
 
 	if cfg.Database.Enabled {
 		database.SaveRecordsToDatabase(recordsToDownload)
