@@ -107,15 +107,7 @@ func (db *BaseDatabase) SaveRecordsToDatabase(records []*models.DataRecord) {
 	recordCount := len(records)
 	batchCount := int(math.Ceil(float64(recordCount / batchSize)))
 
-	for i := 0; i < batchCount; i++ {
-		var preparedRecords []sqlc.BulkInsertRecordParams
-		recordChan := make(chan sqlc.BulkInsertRecordParams, batchSize)
-
-		var preparedFiles []sqlc.BulkInsertFilesParams
-		filesChan := make(chan sqlc.BulkInsertFilesParams, batchSize)
-
-		usersChan := make(chan string, batchSize)
-
+	for i := 0; i <= batchCount; i++ {
 		lower := skipped
 		upper := skipped + batchSize
 		if upper > recordCount {
@@ -124,7 +116,16 @@ func (db *BaseDatabase) SaveRecordsToDatabase(records []*models.DataRecord) {
 		batchRecords := records[lower:upper]
 		skipped += batchSize
 
-		go func() {
+        var preparedRecords []sqlc.BulkInsertRecordParams
+        recordChan := make(chan sqlc.BulkInsertRecordParams, batchSize)
+
+        var preparedFiles []sqlc.BulkInsertFilesParams
+        filesChan := make(chan sqlc.BulkInsertFilesParams, batchSize)
+
+        usersChan := make(chan string, batchSize)
+
+        startTime := time.Now()
+        go func() {
 			for record := range recordChan {
 				preparedRecords = append(preparedRecords, record)
 			}
@@ -217,9 +218,17 @@ func (db *BaseDatabase) SaveRecordsToDatabase(records []*models.DataRecord) {
 			db.saveRecordsToDatabase(preparedRecords)
 			preparedRecords = nil
 		}()
-
 		dbwg.Wait()
-		db.log.Info().Msgf("Completed batch %d / %d | Active goroutines: %d", i, batchCount, runtime.NumGoroutine())
+
+        elapsedTime := time.Since(startTime)
+
+        db.log.Info().Msgf("Completed batch %d / %d | Remaining: %d | Batch elapsed time: %v",
+            i,
+            batchCount,
+            batchCount - (i + 1),
+            elapsedTime,
+        )
+        db.log.Info().Msgf("Active goroutines: %d", runtime.NumGoroutine())
 	}
 }
 
